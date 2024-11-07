@@ -6,14 +6,23 @@ const { validationResult } = require("express-validator");
 const generateToken = (user) => {
   try {
     console.log(`process.env.JWT_SECRET value:`, process.env.JWT_SECRET);
-    const token = jwt.sign({ id: user._id, email: user.email, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: "30d",
-    });
+    const token = jwt.sign(
+      {
+        id: user._id,
+        email: user.email,
+        role: user.role,
+        profilePicture: user.profilePicture,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "30d",
+      }
+    );
     console.log(`Generated Token:`, token);
     return token;
   } catch (error) {
-    console.error('Error generating token:', error);
-    throw new Error('Token generation failed');
+    console.error("Error generating token:", error);
+    throw new Error("Token generation failed");
   }
 };
 
@@ -76,7 +85,7 @@ exports.login = async (req, res) => {
       email: user.email,
       role: user.role,
       profilePicture: user.profilePicture,
-      token: generateToken(user._id),
+      token: generateToken(user),
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
